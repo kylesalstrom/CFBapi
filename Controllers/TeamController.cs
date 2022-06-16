@@ -32,6 +32,7 @@ public class TeamController : ControllerBase
                 var cacheKey = $"FBSTeams_{year}";
                 if(!_memoryCache.TryGetValue(cacheKey, out response))
                 {
+                    Console.WriteLine("Not Cached");
                     step = "Querying CFBD TeamsApi.GetFbsTeams";
                     var cfbdTeams = new TeamsApi().GetFbsTeams(_year);
 
@@ -77,6 +78,10 @@ public class TeamController : ControllerBase
                         .SetSlidingExpiration(TimeSpan.FromMinutes(30));
                     _memoryCache.Set(cacheKey, response, cacheEntryOptions);
                 }
+                else
+                {
+                    Console.WriteLine("Cached!!!");
+                }
             }
             catch (Exception e)
             {
@@ -90,6 +95,7 @@ public class TeamController : ControllerBase
     {
         var teamList = teams.ToList();
 
+        teamList.Where(t => t.Id == 38).First().AltColor = "#000"; //Set Colorado AltColor to Black
         teamList.Where(t => t.Id == 213).First().AltColor = "#fff"; //Set Penn State AltColor to White
         teamList.Where(t => t.Id == 204).First().AltColor = "#000"; //Set Oregon State AltColor to Black
         teamList.Where(t => t.Id == 264).First().AltColor = "#B7A57A"; //Set Washington AltColor to Gold
