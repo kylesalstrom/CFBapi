@@ -7,24 +7,8 @@ using CFBSharp.Client;
 var builder = WebApplication.CreateBuilder(args);
 
 //Enable Cors for use in Dev
-string AllowAnyOrigin = "_allowAnyOrigin";
-string AllowSpecificOrigins = "_allowSpecificOrigins";
+string AllowAnyOrigin = "AllowAnyOrigin";
 builder.Services.AddCors(options => options.AddPolicy(AllowAnyOrigin, policy => policy.AllowAnyOrigin()));
-builder.Services.AddCors(options => options.AddPolicy(AllowSpecificOrigins,
-                      policy  =>
-                      {
-                          policy.WithOrigins("https://dev.CFBtracker.com",
-                                              "https://www.CFBtracker.com",
-                                              "https://*.CFBtracker.com",
-                                              "http://dev.CFBtracker.com",
-                                              "http://www.CFBtracker.com",
-                                              "http://*.CFBtracker.com",
-                                              "*.CFBtracker.com",
-                                              "*CFBtracker.com",
-                                              "CFBtracker.com")
-                                                  .AllowAnyHeader()
-                                                  .AllowAnyMethod();
-                      }));
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -44,7 +28,6 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 string cfbdAPIkey;
-app.UseCors(AllowAnyOrigin);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -74,25 +57,13 @@ else
 Configuration.Default.ApiKey.Add("Authorization", cfbdAPIkey);
 Configuration.Default.ApiKeyPrefix.Add("Authorization", "Bearer");
 
-app.UseHttpsRedirection();
-//app.UseStaticFiles();
-//app.UseRouting();
+app.UseHostFiltering();
 
-//app.UseCors();
+app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-// app.UseEndpoints(endpoints =>
-// {
-//     endpoints.MapGet("/echo",
-//         context => context.Response.WriteAsync("echo"))
-//         .RequireCors(AllowSpecificOrigins);
-
-//     endpoints.MapControllers()
-//              .RequireCors(AllowAnyOrigin);
-
-//     endpoints.MapGet("/echo2",
-//         context => context.Response.WriteAsync("echo2"));
-// });
+app.UseCors(AllowAnyOrigin);
+app.MapControllers();
 
 app.Run();
