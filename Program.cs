@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HostFiltering;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Azure.Core;
@@ -12,6 +13,14 @@ builder.Services.AddCors(options => options.AddPolicy(AllowAnyOrigin, policy => 
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddMemoryCache();
+
+// Set up host filtering
+var hosts = builder.Configuration["AllowedHosts"]?.Split(new[] { ';'}, StringSplitOptions.RemoveEmptyEntries);
+if(hosts?.Length > 0)
+{
+    builder.Services.Configure<HostFilteringOptions>(options => options.AllowedHosts = hosts);
+}
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -49,6 +58,8 @@ else
 // Connect to CollegeFootballData.com API
 Configuration.Default.ApiKey.Add("Authorization", cfbdAPIkey);
 Configuration.Default.ApiKeyPrefix.Add("Authorization", "Bearer");
+
+app.UseHostFiltering();
 
 app.UseHttpsRedirection();
 
