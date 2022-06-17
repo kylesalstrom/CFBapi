@@ -14,7 +14,14 @@ builder.Services.AddCors(options => options.AddPolicy(AllowSpecificOrigins,
                       policy  =>
                       {
                           policy.WithOrigins("https://dev.CFBtracker.com",
-                                              "https://www.CFBtracker.com")
+                                              "https://www.CFBtracker.com",
+                                              "https://*.CFBtracker.com",
+                                              "http://dev.CFBtracker.com",
+                                              "http://www.CFBtracker.com",
+                                              "http://*.CFBtracker.com",
+                                              "*.CFBtracker.com",
+                                              "*CFBtracker.com",
+                                              "CFBtracker.com")
                                                   .AllowAnyHeader()
                                                   .AllowAnyMethod();
                       }));
@@ -83,7 +90,7 @@ app.UseEndpoints(endpoints =>
         .RequireCors(AllowSpecificOrigins);
 
     endpoints.MapControllers()
-             .RequireCors(AllowSpecificOrigins);
+             .RequireCors(AllowAnyOrigin);
 
     endpoints.MapGet("/echo2",
         context => context.Response.WriteAsync("echo2"));
