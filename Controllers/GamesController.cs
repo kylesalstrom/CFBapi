@@ -33,7 +33,6 @@ public class GamesController : ControllerBase
                 var cacheKey = $"Games_{year}_{week}";
                 if(!_memoryCache.TryGetValue(cacheKey, out response))
                 {
-                    Console.WriteLine("Not Cached");
                     step = "Querying CFBD GamesApi.GetGames";
                     var cfbdGames = new GamesApi().GetGames(_year,_week);
 
@@ -44,10 +43,6 @@ public class GamesController : ControllerBase
                     var cacheEntryOptions = new MemoryCacheEntryOptions()
                         .SetSlidingExpiration(TimeSpan.FromMinutes(30));
                     _memoryCache.Set(cacheKey, response, cacheEntryOptions);
-                }
-                else
-                {
-                    Console.WriteLine("Cached!!!");
                 }
             }
             catch (Exception e)

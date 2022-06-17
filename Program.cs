@@ -10,14 +10,13 @@ string AllowAnyOrigin = "AllowAnyOrigin";
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddMemoryCache();
-builder.Services.AddCors(options => options.AddPolicy(AllowAnyOrigin, policy => policy.WithOrigins("https://dev.cfbtracker.com").AllowAnyHeader()));
+builder.Services.AddCors(options => options.AddPolicy(AllowAnyOrigin, policy => policy.AllowAnyOrigin()));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-app.UseCors(AllowAnyOrigin);
 
 string cfbdAPIkey;
 // Configure the HTTP request pipeline.
@@ -26,6 +25,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
     cfbdAPIkey = builder.Configuration["CFBD_API_KEY"];
+    app.UseCors(AllowAnyOrigin);
 }
 else
 {

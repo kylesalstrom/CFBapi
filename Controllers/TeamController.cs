@@ -32,7 +32,6 @@ public class TeamController : ControllerBase
                 var cacheKey = $"FBSTeams_{year}";
                 if(!_memoryCache.TryGetValue(cacheKey, out response))
                 {
-                    Console.WriteLine("Not Cached");
                     step = "Querying CFBD TeamsApi.GetFbsTeams";
                     var cfbdTeams = new TeamsApi().GetFbsTeams(_year);
 
@@ -77,10 +76,6 @@ public class TeamController : ControllerBase
                     var cacheEntryOptions = new MemoryCacheEntryOptions()
                         .SetSlidingExpiration(TimeSpan.FromMinutes(30));
                     _memoryCache.Set(cacheKey, response, cacheEntryOptions);
-                }
-                else
-                {
-                    Console.WriteLine("Cached!!!");
                 }
             }
             catch (Exception e)
