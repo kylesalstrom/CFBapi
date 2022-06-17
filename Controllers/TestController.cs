@@ -11,6 +11,6 @@ public class TestController : ControllerBase
     [HttpGet()]
     public Test Get()
     {
-        return new Test("Hey Now!");
+        return new Test("Hey Now!!");
     }
 }
