@@ -10,13 +10,7 @@ string AllowAnyOrigin = "AllowAnyOrigin";
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddMemoryCache();
-builder.Services.AddCors(options => 
-    options.AddPolicy(AllowAnyOrigin, policy => 
-        policy
-        .AllowAnyOrigin()
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-        ));
+builder.Services.AddCors(options => options.AddPolicy(AllowAnyOrigin, policy => policy.WithOrigins("https://dev.cfbtracker.com").AllowAnyHeader()));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
