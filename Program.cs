@@ -44,12 +44,12 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 string cfbdAPIkey;
+app.UseCors(AllowAnyOrigin);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseCors(AllowAnyOrigin);
     cfbdAPIkey = builder.Configuration["CFBD_API_KEY"];
 }
 else
@@ -67,7 +67,6 @@ else
     var client = new SecretClient(new Uri("https://cfbvault.vault.azure.net/"), new DefaultAzureCredential(),options);
     KeyVaultSecret secret = client.GetSecret("CFBD-API-KEY");
     cfbdAPIkey = secret.Value;
-    app.UseCors(AllowSpecificOrigins);
 }
 
 
@@ -76,24 +75,24 @@ Configuration.Default.ApiKey.Add("Authorization", cfbdAPIkey);
 Configuration.Default.ApiKeyPrefix.Add("Authorization", "Bearer");
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
-app.UseRouting();
+//app.UseStaticFiles();
+//app.UseRouting();
 
-app.UseCors();
+//app.UseCors();
 
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapGet("/echo",
-        context => context.Response.WriteAsync("echo"))
-        .RequireCors(AllowSpecificOrigins);
+// app.UseEndpoints(endpoints =>
+// {
+//     endpoints.MapGet("/echo",
+//         context => context.Response.WriteAsync("echo"))
+//         .RequireCors(AllowSpecificOrigins);
 
-    endpoints.MapControllers()
-             .RequireCors(AllowAnyOrigin);
+//     endpoints.MapControllers()
+//              .RequireCors(AllowAnyOrigin);
 
-    endpoints.MapGet("/echo2",
-        context => context.Response.WriteAsync("echo2"));
-});
+//     endpoints.MapGet("/echo2",
+//         context => context.Response.WriteAsync("echo2"));
+// });
 
 app.Run();
