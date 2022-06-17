@@ -51,7 +51,7 @@ else
     KeyVaultSecret secret = client.GetSecret("CFBD-API-KEY");
     cfbdAPIkey = secret.Value;
 }
-
+app.UseCors(AllowAnyOrigin);
 
 // Connect to CollegeFootballData.com API
 Configuration.Default.ApiKey.Add("Authorization", cfbdAPIkey);
@@ -63,7 +63,6 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.UseCors(AllowAnyOrigin);
 app.MapControllers();
 
 app.Run();
