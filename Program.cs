@@ -5,27 +5,25 @@ using Azure.Core;
 using CFBSharp.Client;
 
 var builder = WebApplication.CreateBuilder(args);
-
-//Enable Cors for use in Dev
 string AllowAnyOrigin = "AllowAnyOrigin";
-builder.Services.AddCors(options => options.AddPolicy(AllowAnyOrigin, policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddMemoryCache();
-
-// Set up host filtering
-var hosts = builder.Configuration["AllowedHosts"]?.Split(new[] { ';'}, StringSplitOptions.RemoveEmptyEntries);
-if(hosts?.Length > 0)
-{
-    builder.Services.Configure<HostFilteringOptions>(options => options.AllowedHosts = hosts);
-}
+builder.Services.AddCors(options => 
+    options.AddPolicy(AllowAnyOrigin, policy => 
+        policy
+        .AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        ));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+app.UseCors(AllowAnyOrigin);
 
 string cfbdAPIkey;
 // Configure the HTTP request pipeline.
@@ -51,18 +49,11 @@ else
     KeyVaultSecret secret = client.GetSecret("CFBD-API-KEY");
     cfbdAPIkey = secret.Value;
 }
-app.UseCors(AllowAnyOrigin);
 
 // Connect to CollegeFootballData.com API
 Configuration.Default.ApiKey.Add("Authorization", cfbdAPIkey);
 Configuration.Default.ApiKeyPrefix.Add("Authorization", "Bearer");
 
-app.UseHostFiltering();
-
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
