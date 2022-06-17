@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 //Enable Cors for use in Dev
 string AllowAnyOrigin = "AllowAnyOrigin";
-builder.Services.AddCors(options => options.AddPolicy(AllowAnyOrigin, policy => policy.AllowAnyOrigin()));
+builder.Services.AddCors(options => options.AddPolicy(AllowAnyOrigin, policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
 // Add services to the container.
 builder.Services.AddControllers();
