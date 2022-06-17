@@ -8,13 +8,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 //Enable Cors for use in Dev
 string AllowAnyOrigin = "_allowAnyOrigin";
-string MyAllowSpecificOrigins = "_allowSpecificOrigins";
+string AllowSpecificOrigins = "_allowSpecificOrigins";
 builder.Services.AddCors(options => options.AddPolicy(AllowAnyOrigin, policy => policy.AllowAnyOrigin()));
-builder.Services.AddCors(options => options.AddPolicy(MyAllowSpecificOrigins,
+builder.Services.AddCors(options => options.AddPolicy(AllowSpecificOrigins,
                       policy  =>
                       {
                           policy.WithOrigins("https://dev.CFBtracker.com",
-                                              "https://www.CFBtracker.com");
+                                              "https://www.CFBtracker.com")
+                                                  .AllowAnyHeader()
+                                                  .AllowAnyMethod();
                       }));
 
 // Add services to the container.
@@ -58,7 +60,7 @@ else
     var client = new SecretClient(new Uri("https://cfbvault.vault.azure.net/"), new DefaultAzureCredential(),options);
     KeyVaultSecret secret = client.GetSecret("CFBD-API-KEY");
     cfbdAPIkey = secret.Value;
-    app.UseCors(MyAllowSpecificOrigins);
+    app.UseCors(AllowSpecificOrigins);
 }
 
 
@@ -66,8 +68,25 @@ else
 Configuration.Default.ApiKey.Add("Authorization", cfbdAPIkey);
 Configuration.Default.ApiKeyPrefix.Add("Authorization", "Bearer");
 
-app.UseHostFiltering();
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+
+app.UseCors();
+
 app.UseAuthorization();
-app.MapControllers();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapGet("/echo",
+        context => context.Response.WriteAsync("echo"))
+        .RequireCors(AllowSpecificOrigins);
+
+    endpoints.MapControllers()
+             .RequireCors(AllowSpecificOrigins);
+
+    endpoints.MapGet("/echo2",
+        context => context.Response.WriteAsync("echo2"));
+});
+
 app.Run();
